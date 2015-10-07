@@ -8,6 +8,7 @@
 #include "SVPoint.h"
 #include "ofxDoubleToStringHelper.h"
 #include "ofxStreetViewCollector.h"
+#include "ofxAutoReloadedShader.h"
 
 class ofApp : public ofBaseApp{//, public ofThread{
 	public:
@@ -32,21 +33,22 @@ class ofApp : public ofBaseApp{//, public ofThread{
     
     ofxGrabCam  cam;
 
-    ofMesh mesh;
+    ofMesh mesh, normalMesh;
     
+    void moveMeshToOrigin(ofMesh& mesh);
 
     bool bUseCam;
     map<string, SVPoint> points;
     void addPoint(SVPoint & p);
     ofVec3f convertLatLon(ofVec3f v);
     void loadPoints(string path);
-    
-    
-    ofNode node;
-    
-    void rotatePoints();
+
+    ofxPanel gui;
+    ofParameter<float>thickness, heightMult;
+
     ofVec3f norm, dir, axis, mn, mx, mn2, mx2, centroid;
     ofVec3f lim1, lim2, origin;
     bool bDrawGrid;
-
+    ofxAutoReloadedShader shader;
+    bool doShader;
 };
