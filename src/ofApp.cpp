@@ -13,7 +13,7 @@ void ofApp::setup(){
     centroid.set(0);
     centroid = convertLatLon(origin);
     mesh.setMode(OF_PRIMITIVE_TRIANGLES);
-
+    
     normalMesh.setMode(OF_PRIMITIVE_LINES);
     
     bDrawGrid  = true;
@@ -25,10 +25,10 @@ void ofApp::setup(){
     doShader = true;
     
     shader.load("shader");
-
+    
     gui.setup();
-    gui.add(thickness.set("thickness", 1,0, 30));
-    gui.add(heightMult.set("heightMult", 0, 1, 100));
+    gui.add(thickness.set("thickness", 1,0, 5));
+    gui.add(heightMult.set("heightMult", 1, 1, 10));
     
     
 }
@@ -52,7 +52,7 @@ void ofApp::draw(){
     ofSetColor(255);
     mesh.draw();
     if(doShader) shader.end();
-    normalMesh.draw();
+   // normalMesh.draw();
     
     if(bDrawGrid){
         ofDrawGrid(1, 20, true);
@@ -109,45 +109,62 @@ void ofApp::loadPoints(string path){
         }
     }
     /*
-    for (int i = 0; i < mesh.getVertices().size(); i++) {
-        mesh.getVertices()[i] -= centroid;
-    }
-    ofQuaternion rot;
-    rot.makeRotate(centroid.getNormalized(), ofVec3f(0,1,0));
-    for (int i = 0; i < mesh.getVertices().size(); i++) {
-        mesh.getVertices()[i] = rot*mesh.getVertices()[i];
-    }
-    for (int i = 0; i < mesh.getVertices().size(); i++) {
-        mesh.getVertices()[i] *=0.1;
-    }
-    //*/
-//    moveMeshToOrigin(mesh);
+     for (int i = 0; i < mesh.getVertices().size(); i++) {
+     mesh.getVertices()[i] -= centroid;
+     }
+     ofQuaternion rot;
+     rot.makeRotate(centroid.getNormalized(), ofVec3f(0,1,0));
+     for (int i = 0; i < mesh.getVertices().size(); i++) {
+     mesh.getVertices()[i] = rot*mesh.getVertices()[i];
+     }
+     for (int i = 0; i < mesh.getVertices().size(); i++) {
+     mesh.getVertices()[i] *=0.1;
+     }
+     //*/
+    //    moveMeshToOrigin(mesh);
     moveMeshToOrigin(normalMesh);
     vector<ofVec3f>& v = normalMesh.getVertices();
     for (int i = 0; i < v.size()-1; i+=2) {
-    
-     int  ind = mesh.getNumVertices();
-     ofVec3f c = v[i+1] - v[i];
-     c.normalize();
-     c.getCrossed(ofVec3f(0,1,0));
+        int  ind = mesh.getNumVertices();
+        mesh.addVertex(v[i]);
+        mesh.addVertex(v[i]);
         
-     ofFloatColor fc(c.x, c.y, c.z, 1.0);
-     mesh.addColor(fc);
-     mesh.addColor(fc);
-     mesh.addColor(fc);
-     mesh.addColor(fc);
-    
-     mesh.addVertex(v[i]);
-     mesh.addVertex(v[i+1]);
+        mesh.addVertex(v[i+1]);
+        mesh.addVertex(v[i+1]);
+        
 
-     mesh.addIndex(ind);
-     mesh.addIndex(ind + 1);
-     mesh.addIndex(ind + 2);
-     mesh.addIndex(ind + 1);
-     mesh.addIndex(ind + 2);
-     mesh.addIndex(ind + 3);
+        mesh.addIndex(ind);
+        mesh.addIndex(ind + 1);
+        mesh.addIndex(ind + 2);
+        mesh.addIndex(ind + 1);
+        mesh.addIndex(ind + 2);
+        mesh.addIndex(ind + 3);
+      
+        ofVec3f c = v[i+1] - v[i];
+        c.normalize();
+        c.cross(ofVec3f(0,1,0));
         
-     }
+        ofFloatColor fc(c.x, c.y, c.z, 1.0);
+        mesh.addColor(fc);
+        mesh.addColor(fc);
+        mesh.addColor(fc);
+        mesh.addColor(fc);
+    }
+    vector<ofVec3f> vc = normalMesh.getVertices();
+    for (int i = 0; i < vc.size()-1; i+=2) {
+        ofVec3f c = vc[i+1] - vc[i];
+        c.normalize();
+        c.cross(ofVec3f(0,1,0));
+        normalMesh.addVertex(vc[i]);
+        normalMesh.addVertex(vc[i] + c);
+        normalMesh.addColor(ofFloatColor::magenta);
+        normalMesh.addColor(ofFloatColor::magenta);
+        normalMesh.addVertex(vc[i]);
+        normalMesh.addVertex(vc[i] + ofVec3f(0,1,0));
+        normalMesh.addColor(ofFloatColor::white);
+        normalMesh.addColor(ofFloatColor::white);
+        
+    }
     
 }
 //--------------------------------------------------------------
@@ -172,53 +189,53 @@ void ofApp::addPoint(SVPoint & p){
             if (points.count(p.links[i])>0) {
                 if(points[p.links[i]].z != -1.0){
                     /*
-                    int  ind = mesh.getNumVertices();
-                    ofVec3f cc = points[p.links[i]].pos - v;
-                    cc.normalize();
-                    ofVec3f c = cc.getCrossed(ofVec3f(0,1,0));
-                    
-                    c.y = 0;
-                    c.x *= 10.0;
-                    c.z *= 10.0;
-                    //*/
+                     int  ind = mesh.getNumVertices();
+                     ofVec3f cc = points[p.links[i]].pos - v;
+                     cc.normalize();
+                     ofVec3f c = cc.getCrossed(ofVec3f(0,1,0));
+                     
+                     c.y = 0;
+                     c.x *= 10.0;
+                     c.z *= 10.0;
+                     //*/
                     /*
-                    ofFloatColor fc(c.x, c.y, c.z, 1.0);
-                    mesh.addColor(fc);
-                    mesh.addColor(fc);
-                    mesh.addColor(fc);
-                    mesh.addColor(fc);
-                    //*/
+                     ofFloatColor fc(c.x, c.y, c.z, 1.0);
+                     mesh.addColor(fc);
+                     mesh.addColor(fc);
+                     mesh.addColor(fc);
+                     mesh.addColor(fc);
+                     //*/
                     normalMesh.addVertex(v);// + c);
                     //mesh.addVertex(v);// - c);
                     normalMesh.addVertex(points[p.links[i]].pos);// + c);
                     normalMesh.addColor(ofFloatColor::yellow);
                     normalMesh.addColor(ofFloatColor::yellow);
                     //  mesh.addVertex(points[p.links[i]].pos);// - c);
-               //     mesh.getVertices()[mesh.getNumVertices()-1].y = 0;
-                 //   mesh.getVertices()[mesh.getNumVertices()-2].y = 0;
-                   // mesh.getVertices()[mesh.getNumVertices()-3].y = 0;
-                   // mesh.getVertices()[mesh.getNumVertices()-4].y = 0;
+                    //     mesh.getVertices()[mesh.getNumVertices()-1].y = 0;
+                    //   mesh.getVertices()[mesh.getNumVertices()-2].y = 0;
+                    // mesh.getVertices()[mesh.getNumVertices()-3].y = 0;
+                    // mesh.getVertices()[mesh.getNumVertices()-4].y = 0;
                     /*
-                    mesh.addIndex(ind);
-                    mesh.addIndex(ind + 1);
-                    mesh.addIndex(ind + 2);
-                    mesh.addIndex(ind + 1);
-                    mesh.addIndex(ind + 2);
-                    mesh.addIndex(ind + 3);
-                    //
-                    normalMesh.addVertex(v);
-                    normalMesh.addVertex(points[p.links[i]].pos);
-                    normalMesh.addColor(ofFloatColor::yellow);
-                    normalMesh.addColor(ofFloatColor::yellow);
-                    normalMesh.addVertex(v);
-                    normalMesh.addVertex(c*10+v);
-                    normalMesh.addColor(ofFloatColor::magenta);
-                    normalMesh.addColor(ofFloatColor::magenta);
-                    normalMesh.addVertex(v);
-                    normalMesh.addVertex(ofVec3f(0,10,0)+v);
-                    normalMesh.addColor(ofFloatColor::white);
-                    normalMesh.addColor(ofFloatColor::white);
-                    //*/
+                     mesh.addIndex(ind);
+                     mesh.addIndex(ind + 1);
+                     mesh.addIndex(ind + 2);
+                     mesh.addIndex(ind + 1);
+                     mesh.addIndex(ind + 2);
+                     mesh.addIndex(ind + 3);
+                     //
+                     normalMesh.addVertex(v);
+                     normalMesh.addVertex(points[p.links[i]].pos);
+                     normalMesh.addColor(ofFloatColor::yellow);
+                     normalMesh.addColor(ofFloatColor::yellow);
+                     normalMesh.addVertex(v);
+                     normalMesh.addVertex(c*10+v);
+                     normalMesh.addColor(ofFloatColor::magenta);
+                     normalMesh.addColor(ofFloatColor::magenta);
+                     normalMesh.addVertex(v);
+                     normalMesh.addVertex(ofVec3f(0,10,0)+v);
+                     normalMesh.addColor(ofFloatColor::white);
+                     normalMesh.addColor(ofFloatColor::white);
+                     //*/
                 }
             }
         }
@@ -232,9 +249,9 @@ ofVec3f ofApp::convertLatLon(ofVec3f v){
     ofVec3f center = ofVec3f(0,0,EARTH_RADIUS+(v.z));///1000));
     
     ofVec3f r(latRot * longRot * center);//
-//
-//    r = (r -centroid );
-//    r.y -= EARTH_RADIUS;
+    //
+    //    r = (r -centroid );
+    //    r.y -= EARTH_RADIUS;
     return r;
     //*/
 }

@@ -16,7 +16,7 @@ void main(){
     }//*/
     vec4 pos;
     pos.x = gl_Vertex.x + ind * c.x * thickness;
-    pos.y = gl_Vertex.y * heightMult,
+    pos.y = gl_Vertex.y * heightMult;
     pos.z = gl_Vertex.z + ind * c.z * thickness;
     pos.w = 1.0;
 //    gl_Position = gl_ModelViewProjectionMatrix *gl_Vertex;
