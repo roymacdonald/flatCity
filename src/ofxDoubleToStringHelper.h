@@ -12,7 +12,7 @@ static double stringToDouble(string s) {
     
     double d;
     stringstream cur;
-    cur.precision(10);
+    cur.precision(20);
     cur << s;
     cur >> d;
     return d;
@@ -22,7 +22,7 @@ static float stringToFloat(string s) {
     
     float f;
     stringstream cur;
-    cur.precision(10);
+    cur.precision(20);
     cur << s;
     cur >> f;
     return f;
@@ -32,7 +32,7 @@ static float stringToFloat(string s) {
 static string doubleToString(double d){
     string s;
     stringstream cur;
-    cur.precision(10);
+    cur.precision(20);
     cur << d;
     cur >> s;
     return s;
@@ -40,7 +40,7 @@ static string doubleToString(double d){
 static string floatToString(float d){
     string s;
     stringstream cur;
-    cur.precision(10);
+    cur.precision(20);
     cur << d;
     cur >> s;
     return s;

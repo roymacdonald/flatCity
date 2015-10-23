@@ -17,8 +17,9 @@ public:
     void setup(ofVec3f lim1, ofVec3f lim2);
     void update();
     void startCollectingData();
+    void collectFromNextPoint();
     void exit();
-    void setPanoId(string _pano_id);
+    bool setPanoId(string _pano_id);
     void setLatLon(double _lat, double _lng);
     
     void urlResponse(ofHttpResponse & response);
@@ -35,10 +36,17 @@ public:
     
     map<string, SVPoint> points;
     
+    void loadAndCollect(string path);
     
     ofXml xml;
     bool bFirstPoint;
     
     bool bNewDataCollected;
 
+    bool getPointLinks(SVPoint& p);
+
+private:
+
+    map< string, SVPoint>::iterator collectIterator;
+    
 };

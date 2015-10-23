@@ -28,23 +28,45 @@ void ofxStreetViewCollector::setup(ofVec3f lim1, ofVec3f lim2){
     
 }
 //--------------------------------------------------------------
+void ofxStreetViewCollector::loadAndCollect(string path){
+    loadPoints(path);
+    collectIterator = points.begin();
+    startCollectingData();
+    
+}
+//--------------------------------------------------------------
 void ofxStreetViewCollector::startCollectingData(){
     bNewDataCollected = true;
     
     if (points.size() == 0) {
         bFirstPoint = true;
-        setLatLon(40.7304056,-74.0000006);
+        setLatLon(40.714373, -74.006141);
     }else{
-        map< string, SVPoint>::iterator it = points.end();
-        it--;
-        SVPoint p = it->second;
-        for (int i =0; i < p.links.size(); i++) {
-            cout << p.links[i] << endl;
-            setPanoId(p.links[i]);
-        }
+        collectFromNextPoint();
     }
 }
-
+//--------------------------------------------------------------
+void ofxStreetViewCollector::collectFromNextPoint(){
+    if (collectIterator != points.end()) {
+        SVPoint p = collectIterator->second;
+        
+        ++collectIterator;
+        if (!getPointLinks(p)) {
+            collectFromNextPoint();
+        }
+    }else{
+        cout << "COLLECT END!!!!" << endl;
+    }
+}
+//--------------------------------------------------------------
+bool ofxStreetViewCollector::getPointLinks(SVPoint& p){
+    bool bFound = false;
+    for (int i =0; i < p.links.size(); i++) {
+        //cout << p.links[i] << endl;
+        bFound |= setPanoId(p.links[i]);
+    }
+    return  bFound;
+}
 //--------------------------------------------------------------
 void ofxStreetViewCollector::setLatLon(double _lat, double _lon){
     bNewDataCollected = true;
@@ -57,7 +79,7 @@ void ofxStreetViewCollector::setLatLon(double _lat, double _lon){
     ofLoadURLAsync(data_url);
 }
 //--------------------------------------------------------------
-void ofxStreetViewCollector::setPanoId(string _pano_id){
+bool ofxStreetViewCollector::setPanoId(string _pano_id){
     if(points.count(_pano_id) == 0){
         if(!bRegister){
             ofRegisterURLNotification(this);
@@ -65,8 +87,52 @@ void ofxStreetViewCollector::setPanoId(string _pano_id){
         }
         data_url = "http://cbk0.google.com/cbk?output=xml&panoid="+_pano_id;
         ofLoadURLAsync(data_url);
+        return true;
+    }
+    return false;
+}
+//--------------------------------------------------------------
+void ofxStreetViewCollector::loadPoints(string path){
+    ofXml xml;
+    //  points.clear();
+    if (xml.load(path)) {
+        if(xml.exists("SVPoint")){
+            xml.setTo("SVPoint[0]");
+            do {
+                if(xml.getName() == "SVPoint"){
+                    SVPoint point;
+                    point.ID = xml.getValue("id");
+                    string pos = xml.getValue("pos");
+                    vector<string>p = ofSplitString(pos, ", ");
+                    
+                    point.setPos(stringToDouble(p[0]), stringToDouble(p[1]), stringToDouble(p[2]));
+                    if (xml.exists("links")) {
+                        xml.setTo("links[0]");
+                        if (xml.getName() == "links") {
+                            if (xml.exists("link")) {
+                                xml.setTo("link[0]");
+                                do {
+                                    if (xml.getName() == "link") {
+                                        point.links.push_back(xml.getValue());
+                                    }
+                                }
+                                while(xml.setToSibling());
+                            }
+                        }
+                        xml.setToParent();
+                        xml.setToParent();
+                    }
+                    if(points.count(point.ID) == 0){
+                        savePoint(point);
+                        points[point.ID] = point;
+                    }
+                }
+            }
+            while( xml.setToSibling() );
+        }
     }
 }
+
 //--------------------------------------------------------------
 void ofxStreetViewCollector::urlResponse(ofHttpResponse & response){
     
@@ -85,9 +151,12 @@ void ofxStreetViewCollector::urlResponse(ofHttpResponse & response){
         double lon = stringToDouble(lonS);
         double elevation = stringToDouble(eleS);
         
+        cout << "new response  "<< latS << "  lonS: " << lonS << "  elev: " << elevation;// << endl;
         
         if(points.count(pano_id) == 0){
+            
             if (area.inside(lat, lon)) {
+                cout << " adding :  " << pano_id ;
                 SVPoint  p;
                 XML.pushTag("panorama");
                 XML.pushTag("annotation_properties");
@@ -104,13 +173,15 @@ void ofxStreetViewCollector::urlResponse(ofHttpResponse & response){
                 points[pano_id] = p;
                 
                 savePoint(p);
-                for (int i = 0; i < p.links.size(); i++) {
-                    setPanoId(p.links[i]);
+                
+                if(!getPointLinks(p)){
+                    collectFromNextPoint();
                 }
             }else{
                 points[pano_id] = SVPoint();
             }
         }
+        cout << endl;
     }
 }
 //--------------------------------------------------------------

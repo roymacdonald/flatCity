@@ -9,6 +9,14 @@
 #include "ofxDoubleToStringHelper.h"
 #include "ofxStreetViewCollector.h"
 #include "ofxAutoReloadedShader.h"
+#include "TravelingCam.h"
+#include "pathEditor.h"
+
+#include "ofQuaternionD.h"
+#include "ofMatrix4x4D.h"
+#include "ofVec3d.h"
+
+//#include "ofxSSAO.h"
 
 class ofApp : public ofBaseApp{//, public ofThread{
 	public:
@@ -30,13 +38,26 @@ class ofApp : public ofBaseApp{//, public ofThread{
 		void gotMessage(ofMessage msg);
     ofxStreetViewCollector collector;
     
-    
     ofxGrabCam  cam;
-
-    ofMesh mesh, normalMesh;
+    bool bEnableFog;
+    TravelingCam tCam;
+   bool bUseTravelingCam;
+    ofMesh mesh, lineMesh, normalsMesh;
+  
+    ofLight light;
     
-    void moveMeshToOrigin(ofMesh& mesh);
-
+    void buildNormals();
+    
+//    ofxSSAO ssao;
+    
+    pathEditor pathEdit;
+    
+    void buildMesh();
+    
+    void moveMeshPointsToOrigin();
+    void movePointToOrigin(ofVec3f& p);
+    vector<ofVec3f> meshPoints;
+    
     bool bUseCam;
     map<string, SVPoint> points;
     void addPoint(SVPoint & p);
@@ -44,11 +65,15 @@ class ofApp : public ofBaseApp{//, public ofThread{
     void loadPoints(string path);
 
     ofxPanel gui;
-    ofParameter<float>thickness, heightMult;
-
+    ofParameter<float>thickness, heightMult, fogStart, fogEnd;
+    ofParameter<ofFloatColor>fogColor;
+    void heightMultChanged(float& f);
     ofVec3f norm, dir, axis, mn, mx, mn2, mx2, centroid;
     ofVec3f lim1, lim2, origin;
     bool bDrawGrid;
     ofxAutoReloadedShader shader;
     bool doShader;
+    string info;
+    vector<ofVec3f>closest;
+    //*/
 };

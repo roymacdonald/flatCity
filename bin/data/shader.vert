@@ -4,10 +4,10 @@
 uniform float thickness;
 uniform float heightMult;
 
-//varying vec4 color;
-
+varying vec4 color;
+varying float zPos;
 void main(){
-   // color = vec4(1.0,1.0,1.0,1.0);
+    color = vec4(1.0,1.0,1.0,1.0);
     //*
     vec4 c = gl_Color;
     int ind = 1;
@@ -20,5 +20,8 @@ void main(){
     pos.z = gl_Vertex.z + ind * c.z * thickness;
     pos.w = 1.0;
 //    gl_Position = gl_ModelViewProjectionMatrix *gl_Vertex;
-        gl_Position = gl_ModelViewProjectionMatrix * pos ;
+    
+    vec4 gPos = gl_ModelViewProjectionMatrix * pos ;
+    zPos = gPos.z;
+    gl_Position = gPos;
 }

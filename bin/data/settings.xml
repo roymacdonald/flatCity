@@ -1,0 +1,15 @@
+<group>
+	<thickness>1</thickness>
+	<heightMult>1</heightMult>
+	<Fog_Start>0</Fog_Start>
+	<Fog_End>800</Fog_End>
+	<Fog_Color>0.392857, 0.392857, 0.392857, 1</Fog_Color>
+	<Traveling_Cam>
+		<Cam_Speed>0.0413265</Cam_Speed>
+		<Start_Stop_ramp>500</Start_Stop_ramp>
+		<altura_camara>5.10204</altura_camara>
+		<resolucion_Curvas>77</resolucion_Curvas>
+		<xenoFactor>0.5</xenoFactor>
+	</Traveling_Cam>
+<group/>
+</group>

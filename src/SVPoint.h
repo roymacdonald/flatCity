@@ -20,6 +20,7 @@ public:
         this->z = z;
         pos.set(x,y,z);
     }
+    ofIndexType meshIndex;
     vector<string>links;
     //    bool bCheckedAll, bIsSet, bIsInside;
     string ID;
