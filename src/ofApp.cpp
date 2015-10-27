@@ -33,7 +33,7 @@ void ofApp::setup(){
     shader.load("shader");
     
     bEnableFog = true;
-    //    bUseTravelingCam = true;
+    bUseTravelingCam = true;
     
     gui.setup();
     gui.add(thickness.set("thickness", 1,0, 40));
@@ -65,11 +65,15 @@ void ofApp::setup(){
     //    ofEnableLighting();
     ofEnableAlphaBlending();
     ofEnableSmoothing();
-    
+/*
     light.enable();
     light.setPointLight();
     light.setPosition(0,20,0);
+   //*/
+    loadPoints(ofToDataPath("nyc_street_data.xml"));
+    pathEdit.loadVertices("SFPC_BKLYN");
     
+    tCam.start();
     ofSetFullscreen(true);
 }
 //--------------------------------------------------------------
