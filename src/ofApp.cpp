@@ -62,7 +62,7 @@ void ofApp::setup(){
     ofEnableDepthTest();
     
     ofSetVerticalSync(true);
-//    ofEnableLighting();
+    //    ofEnableLighting();
     ofEnableAlphaBlending();
     ofEnableSmoothing();
     
@@ -70,11 +70,11 @@ void ofApp::setup(){
     light.setPointLight();
     light.setPosition(0,20,0);
     
-    
+    ofSetFullscreen(true);
 }
 //--------------------------------------------------------------
 void ofApp::heightMultChanged(float& f){
-
+    
     tCam.heightMult = heightMult;
     
 }
@@ -84,8 +84,9 @@ void ofApp::update(){}
 void ofApp::draw(){
     ofBackground(0);
     ofSetColor(255);
-    ofDrawBitmapString(ofToString(points.size() ), 10, 30);
+    //ofDrawBitmapString(ofToString(points.size() ), 10, 30);
     //*
+    ofEnableDepthTest();
     if (bUseTravelingCam) {
         tCam.begin();
     }else{
@@ -114,7 +115,7 @@ void ofApp::draw(){
     }
     if(doShader) shader.end();
     
-    normalsMesh.draw();
+    //    normalsMesh.draw();
     
     if(bDrawGrid){
         ofDrawGrid(1, 20, true);
@@ -127,14 +128,15 @@ void ofApp::draw(){
         for (int i = 0; i < closest.size(); i++) {
             ofDrawSphere(closest[i], 1);
         }
-
+        
         cam.end();
     }
+    ofDisableDepthTest();
     gui.draw();
     
-
-    ofDrawBitmapStringHighlight(info, 200, 30);
- }
+    
+    //    ofDrawBitmapStringHighlight(info, 200, 30);
+}
 
 //--------------------------------------------------------------
 void ofApp::loadPoints(string path){
@@ -154,7 +156,7 @@ void ofApp::loadPoints(string path){
                     
                     point.setPos(stringToDouble(p[0]), stringToDouble(p[1]), stringToDouble(p[2]));
                     point.pos = convertLatLon(point.pos);
-                  //  movePointToOrigin(point.pos);
+                    //  movePointToOrigin(point.pos);
                     if (xml.exists("links")) {
                         xml.setTo("links[0]");
                         if (xml.getName() == "links") {
@@ -187,58 +189,58 @@ void ofApp::buildMesh(){
     mesh.clear();
     vector<ofVec3f>& v = meshPoints;
     for (int i = 0; i < v.size()-1; i+=2) {
-     
+        
         lineMesh.addVertex(v[i]);
         lineMesh.addVertex(v[i+1]);
         lineMesh.addColor(ofFloatColor::black);
         lineMesh.addColor(ofFloatColor::black);
-
+        
         int  ind = mesh.getNumVertices();
         ofVec3f c = v[i+1] - v[i];
         c.normalize();
         c.cross(ofVec3f(0,1,0));
-
+        
         lineMesh.addVertex(v[i]);
         lineMesh.addVertex(v[i]+c);
         lineMesh.addColor(ofFloatColor::blue);
         lineMesh.addColor(ofFloatColor::blue);
         
         /*
-        ofVec3f mv [6];
-        
-        mv[0] = v[i];
-        mv[1] = v[i];
-        mv[2] = v[i+1]+c;
-        
-        mv[3] = v[i+1]+c;
-        mv[4] = v[i]-c;
-        mv[5] = v[i+1]-c;
-        
-        
-        mesh.addVertex(mv[0]);
-        mesh.addVertex(mv[1]);
-        mesh.addVertex(mv[2]);
-        mesh.addVertex(mv[3]);
-        mesh.addVertex(mv[4]);
-        mesh.addVertex(mv[5]);
-        //*/
+         ofVec3f mv [6];
+         
+         mv[0] = v[i];
+         mv[1] = v[i];
+         mv[2] = v[i+1]+c;
+         
+         mv[3] = v[i+1]+c;
+         mv[4] = v[i]-c;
+         mv[5] = v[i+1]-c;
+         
+         
+         mesh.addVertex(mv[0]);
+         mesh.addVertex(mv[1]);
+         mesh.addVertex(mv[2]);
+         mesh.addVertex(mv[3]);
+         mesh.addVertex(mv[4]);
+         mesh.addVertex(mv[5]);
+         //*/
         
         mesh.addVertex(v[i]);
         mesh.addVertex(v[i]);
         mesh.addVertex(v[i+1]);
         mesh.addVertex(v[i+1]);
         /*
-        ofVec3f n [2];
-        
-        n[0] = (mv[2] - mv[0]).normalize().getCrossed((mv[1] - mv[0]).normalize()).normalize();
-        n[0] = (mv[5] - mv[3]).normalize().getCrossed((mv[4] - mv[3]).normalize()).normalize();
-        mesh.addNormal(n[0]);
-        mesh.addNormal(n[0]);
-        mesh.addNormal(n[0]);
-        mesh.addNormal(n[1]);
-        mesh.addNormal(n[1]);
-        mesh.addNormal(n[1]);
-        //*/
+         ofVec3f n [2];
+         
+         n[0] = (mv[2] - mv[0]).normalize().getCrossed((mv[1] - mv[0]).normalize()).normalize();
+         n[0] = (mv[5] - mv[3]).normalize().getCrossed((mv[4] - mv[3]).normalize()).normalize();
+         mesh.addNormal(n[0]);
+         mesh.addNormal(n[0]);
+         mesh.addNormal(n[0]);
+         mesh.addNormal(n[1]);
+         mesh.addNormal(n[1]);
+         mesh.addNormal(n[1]);
+         //*/
         
         mesh.addIndex(ind);
         mesh.addIndex(ind + 1);
@@ -249,7 +251,7 @@ void ofApp::buildMesh(){
         
         //*/
         ofFloatColor fc(c.x, c.y, c.z, 1.0);
-     //   ofFloatColor fc(1.0);
+        //   ofFloatColor fc(1.0);
         mesh.addColor(fc);
         mesh.addColor(fc);
         mesh.addColor(fc);
@@ -279,7 +281,7 @@ void ofApp::buildNormals(){
     mesh.addNormals(ns);
     
     
- //   cout << __PRETTY_FUNCTION__ << "  mesh num Normals: " << mesh.getNumNormals() << endl;
+    //   cout << __PRETTY_FUNCTION__ << "  mesh num Normals: " << mesh.getNumNormals() << endl;
     
     for (unsigned int i =0; i<mesh.getNumIndices()-2; i+=3) {
         ofVec3f v[3];
@@ -308,15 +310,15 @@ void ofApp::movePointToOrigin(ofVec3f& p){
     ofVec3d c(centroid.x, centroid.y, centroid.z);
     rot.makeRotate(c.getNormalized(), ofVec3d(0,1,0));
     pos = rot*pos;
-   // p *=0.1;
+    // p *=0.1;
     pos.x *= -1;
     p.set(pos.x, pos.y, pos.z);
-  /*
-    cout << doubleToString(pos.x) << ", " << doubleToString(pos.y) << ", " << doubleToString(pos.z) << endl;
-    cout << floatToString(p.x) << ", " << floatToString(p.y) << ", " << floatToString(p.z) << endl;
-
-    cout << "//--------------------------------------------------------------" << endl;
-    //*/
+    /*
+     cout << doubleToString(pos.x) << ", " << doubleToString(pos.y) << ", " << doubleToString(pos.z) << endl;
+     cout << floatToString(p.x) << ", " << floatToString(p.y) << ", " << floatToString(p.z) << endl;
+     
+     cout << "//--------------------------------------------------------------" << endl;
+     //*/
 }
 //--------------------------------------------------------------
 void ofApp::moveMeshPointsToOrigin(){
@@ -338,7 +340,7 @@ void ofApp::moveMeshPointsToOrigin(){
     centroid = m.getCentroid();
     
     for (int i = 0; i < meshPoints.size(); i++) {
-     meshPoints[i] -= centroid;
+        meshPoints[i] -= centroid;
     }
     
 }
@@ -354,13 +356,13 @@ void ofApp::addPoint(SVPoint & p){
             if (points.count(p.links[i])>0) {
                 if(points[p.links[i]].z != -1.0){
                     /*
-                    mesh.addIndex(p.meshIndex);
-                    mesh.addIndex(p.meshIndex-1);
-                    mesh.addIndex(points[p.links[i]].meshIndex);
-                    mesh.addIndex(p.meshIndex-1);
-                    mesh.addIndex(points[p.links[i]].meshIndex);
-                    mesh.addIndex(points[p.links[i]].meshIndex-1);
-                    //*/
+                     mesh.addIndex(p.meshIndex);
+                     mesh.addIndex(p.meshIndex-1);
+                     mesh.addIndex(points[p.links[i]].meshIndex);
+                     mesh.addIndex(p.meshIndex-1);
+                     mesh.addIndex(points[p.links[i]].meshIndex);
+                     mesh.addIndex(points[p.links[i]].meshIndex-1);
+                     //*/
                     meshPoints.push_back(v);
                     meshPoints.push_back(points[p.links[i]].pos);
                     
@@ -377,7 +379,7 @@ ofVec3f ofApp::convertLatLon(ofVec3f v){
     ofVec3d center = ofVec3d(0,0,EARTH_RADIUS+(v.z));
     ofVec3d r(latRot * longRot * center);
     
-  ///  cout << doubleToString(r.x) << ", " << doubleToString(r.y) << ", " << doubleToString(r.z) << endl;
+    ///  cout << doubleToString(r.x) << ", " << doubleToString(r.y) << ", " << doubleToString(r.z) << endl;
     return ofVec3f(r.x,r.y,r.z);
 }
 //--------------------------------------------------------------
@@ -391,15 +393,13 @@ void ofApp::keyReleased(int key){
     //*
     if (key == ' '){
         if (bUseTravelingCam) {
-            
-        
-        if (tCam.isStarted()) {
-            tCam.stop();
+            if (tCam.isStarted()) {
+                tCam.stop();
+            }else{
+                tCam.start();
+            }
         }else{
-            tCam.start();
-        }
-        }else{
-        info = "";
+            info = "";
             closest.clear();
         }
     }else
@@ -446,22 +446,22 @@ void ofApp::keyReleased(int key){
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y){}
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){} 
+void ofApp::mouseDragged(int x, int y, int button){}
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     if (ofGetModifierPressed(OF_KEY_SHIFT)) {
         cout << "getclosesrt" << endl;
-    
-    float minDist = FLT_MAX;
-    ofVec3f m(x,y);
-    size_t ind =0;
-    for (size_t i =0; i < meshPoints.size(); i++) {
-        float mn = cam.worldToScreen(meshPoints[i]).distance(m);
-        if (mn < minDist) {
-            minDist = mn;
-            ind = i;
+        
+        float minDist = FLT_MAX;
+        ofVec3f m(x,y);
+        size_t ind =0;
+        for (size_t i =0; i < meshPoints.size(); i++) {
+            float mn = cam.worldToScreen(meshPoints[i]).distance(m);
+            if (mn < minDist) {
+                minDist = mn;
+                ind = i;
+            }
         }
-    }
         info += ofToString(meshPoints[ind])+"\n";
         closest.push_back(meshPoints[ind]);
     }
