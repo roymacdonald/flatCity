@@ -50,6 +50,8 @@ void ofApp::setup(){
     tCam.initCamPos();
     tCam.setNearClip(0);
     gui.add(tCam.parameters);
+    
+    cam.setFarClip(5000);
     //*/
     
     
@@ -82,7 +84,7 @@ void ofApp::update(){}
 void ofApp::draw(){
     ofBackground(0);
     ofSetColor(255);
-    ofDrawBitmapString(ofToString(points.size()), 10, 30);
+    ofDrawBitmapString(ofToString(points.size() ), 10, 30);
     //*
     if (bUseTravelingCam) {
         tCam.begin();
